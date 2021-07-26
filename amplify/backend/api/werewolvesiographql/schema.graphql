@@ -1,0 +1,21 @@
+type Game @model {
+  id: ID!
+  name: String!
+  status: String!
+  players: [Player] @connection(keyName: "byGame", fields: ["id"])
+}
+
+type Player @model @key(name: "byGame", fields: ["gameID"]) {
+  id: ID!
+  name: String!
+  role: String
+  deceased: Boolean
+  gameID: ID!
+  game: Game @connection(fields: ["gameID"])
+}
+
+type Subscription {
+  onCreatePlayerForGame(gameID: ID!): Player @aws_subscribe(mutations: ["createPlayer"])
+  onUpdateGameForId(id: ID!): Game @aws_subscribe(mutations: ["updateGame"])
+  onUpdatePlayerForId(id: ID!): Player @aws_subscribe(mutations: ["updatePlayer"])
+}
