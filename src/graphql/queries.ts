@@ -14,6 +14,7 @@ export const getGame = /* GraphQL */ `
           name
           role
           deceased
+          pick
           gameID
           createdAt
           updatedAt
@@ -53,6 +54,7 @@ export const getPlayer = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id
@@ -81,6 +83,7 @@ export const listPlayers = /* GraphQL */ `
         name
         role
         deceased
+        pick
         gameID
         game {
           id

@@ -9,6 +9,7 @@ export const onCreatePlayerForGame = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id
@@ -37,6 +38,7 @@ export const onUpdateGameForId = /* GraphQL */ `
           name
           role
           deceased
+          pick
           gameID
           createdAt
           updatedAt
@@ -55,6 +57,7 @@ export const onUpdatePlayerForId = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id
@@ -83,6 +86,7 @@ export const onCreateGame = /* GraphQL */ `
           name
           role
           deceased
+          pick
           gameID
           createdAt
           updatedAt
@@ -106,6 +110,7 @@ export const onUpdateGame = /* GraphQL */ `
           name
           role
           deceased
+          pick
           gameID
           createdAt
           updatedAt
@@ -129,6 +134,7 @@ export const onDeleteGame = /* GraphQL */ `
           name
           role
           deceased
+          pick
           gameID
           createdAt
           updatedAt
@@ -147,6 +153,7 @@ export const onCreatePlayer = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id
@@ -170,6 +177,7 @@ export const onUpdatePlayer = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id
@@ -193,6 +201,7 @@ export const onDeletePlayer = /* GraphQL */ `
       name
       role
       deceased
+      pick
       gameID
       game {
         id

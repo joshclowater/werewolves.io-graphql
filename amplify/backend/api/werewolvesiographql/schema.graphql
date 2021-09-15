@@ -10,6 +10,7 @@ type Player @model @key(name: "byGame", fields: ["gameID"]) {
   name: String!
   role: String
   deceased: Boolean
+  pick: String
   gameID: ID!
   game: Game @connection(fields: ["gameID"])
 }

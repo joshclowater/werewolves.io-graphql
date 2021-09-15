@@ -78,6 +78,7 @@ export type Player = {
   name?: string,
   role?: string | null,
   deceased?: boolean | null,
+  pick?: string | null,
   gameID?: string,
   game?: Game,
   createdAt?: string,
@@ -99,6 +100,7 @@ export type CreatePlayerInput = {
   name: string,
   role?: string | null,
   deceased?: boolean | null,
+  pick?: string | null,
   gameID: string,
 };
 
@@ -106,6 +108,7 @@ export type ModelPlayerConditionInput = {
   name?: ModelStringInput | null,
   role?: ModelStringInput | null,
   deceased?: ModelBooleanInput | null,
+  pick?: ModelStringInput | null,
   gameID?: ModelIDInput | null,
   and?: Array< ModelPlayerConditionInput | null > | null,
   or?: Array< ModelPlayerConditionInput | null > | null,
@@ -140,6 +143,7 @@ export type UpdatePlayerInput = {
   name?: string | null,
   role?: string | null,
   deceased?: boolean | null,
+  pick?: string | null,
   gameID?: string | null,
 };
 
@@ -167,6 +171,7 @@ export type ModelPlayerFilterInput = {
   name?: ModelStringInput | null,
   role?: ModelStringInput | null,
   deceased?: ModelBooleanInput | null,
+  pick?: ModelStringInput | null,
   gameID?: ModelIDInput | null,
   and?: Array< ModelPlayerFilterInput | null > | null,
   or?: Array< ModelPlayerFilterInput | null > | null,
@@ -192,6 +197,7 @@ export type CreateGameMutation = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -222,6 +228,7 @@ export type UpdateGameMutation = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -252,6 +259,7 @@ export type DeleteGameMutation = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -275,6 +283,7 @@ export type CreatePlayerMutation = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -305,6 +314,7 @@ export type UpdatePlayerMutation = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -335,6 +345,7 @@ export type DeletePlayerMutation = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -371,6 +382,7 @@ export type GetGameQuery = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -418,6 +430,7 @@ export type GetPlayerQuery = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -451,6 +464,7 @@ export type ListPlayersQuery = {
       name: string,
       role?: string | null,
       deceased?: boolean | null,
+      pick?: string | null,
       gameID: string,
       game?:  {
         __typename: "Game",
@@ -478,6 +492,7 @@ export type OnCreatePlayerForGameSubscription = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -514,6 +529,7 @@ export type OnUpdateGameForIdSubscription = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -536,6 +552,7 @@ export type OnUpdatePlayerForIdSubscription = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -568,6 +585,7 @@ export type OnCreateGameSubscription = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -593,6 +611,7 @@ export type OnUpdateGameSubscription = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -618,6 +637,7 @@ export type OnDeleteGameSubscription = {
         name: string,
         role?: string | null,
         deceased?: boolean | null,
+        pick?: string | null,
         gameID: string,
         createdAt: string,
         updatedAt: string,
@@ -636,6 +656,7 @@ export type OnCreatePlayerSubscription = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -661,6 +682,7 @@ export type OnUpdatePlayerSubscription = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",
@@ -686,6 +708,7 @@ export type OnDeletePlayerSubscription = {
     name: string,
     role?: string | null,
     deceased?: boolean | null,
+    pick?: string | null,
     gameID: string,
     game?:  {
       __typename: "Game",

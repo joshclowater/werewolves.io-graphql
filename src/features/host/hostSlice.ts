@@ -14,6 +14,7 @@ import {
 } from "../../API";
 import { createGame as createGameMutation, updateGame, updatePlayer } from "../../graphql/mutations";
 import { onCreatePlayerForGame } from "../../graphql/subscriptions";
+import { timeout } from '../../utils/Time';
 
 const CREATE_GAME = gql(createGameMutation);
 const UPDATE_GAME = gql(updateGame);
@@ -25,7 +26,7 @@ let newPlayerForGameSubscription: ZenObservable.Subscription;
 interface HostState {
   id: string | undefined,
   name: string | undefined,
-  status: 'creatingGame' | 'waitingForPlayers' | 'startingGame' | 'roundStarted' | undefined
+  status: 'creatingGame' | 'waitingForPlayers' | 'startingGame' | 'gameStarted' | 'nightStarted' | 'werewolvesPick' | undefined
   players: { [id: string]: Player }
 }
 
@@ -140,13 +141,30 @@ export const startGame = (): AppThunk => async (
   // TODO subscribe to each player updates
 
   const gameId = selectId(getState()) as string;
-  const response = await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
+  const startGameResponse = await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
     mutation: UPDATE_GAME,
-    variables: { input: { id: gameId, status: 'roundStarted' } }
+    variables: { input: { id: gameId, status: 'gameStarted' } }
   });
-  console.log('Started game', response);
-  // XXX
-  dispatch(setStatus('roundStarted'));
+  console.log('Started game', startGameResponse);
+  dispatch(setStatus('gameStarted'));
+
+  await timeout(3); // TODO 10
+
+  const roundStartedResponse = await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
+    mutation: UPDATE_GAME,
+    variables: { input: { id: gameId, status: 'nightStarted' } }
+  });
+  console.log('Started night', roundStartedResponse);
+  dispatch(setStatus('nightStarted'));
+
+  await timeout(3); // TODO 5
+
+  const werewolvesPickResponse = await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
+    mutation: UPDATE_GAME,
+    variables: { input: { id: gameId, status: 'werewolvesPick' } }
+  });
+  console.log('Werewolves pick', werewolvesPickResponse);
+  dispatch(setStatus('werewolvesPick'));
 }
 
 export default hostSlice.reducer;

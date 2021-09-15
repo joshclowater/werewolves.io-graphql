@@ -9,28 +9,43 @@ import {
   OnUpdateGameForIdSubscription,
   OnUpdateGameForIdSubscriptionVariables,
   OnUpdatePlayerForIdSubscription,
-  OnUpdatePlayerForIdSubscriptionVariables
+  OnUpdatePlayerForIdSubscriptionVariables,
+  UpdatePlayerMutation,
+  UpdatePlayerMutationVariables
 } from "../../API";
 import { listGames } from "../../graphql/queries";
-import { createPlayer } from "../../graphql/mutations";
+import { createPlayer, updatePlayer } from "../../graphql/mutations";
 import { onUpdateGameForId, onUpdatePlayerForId } from "../../graphql/subscriptions";
 
 const LIST_GAMES = gql(listGames);
 const CREATE_PLAYER = gql(createPlayer);
 const ON_UPDATE_GAME_FOR_ID = gql(onUpdateGameForId);
 const ON_UPDATE_PLAYER_FOR_ID = gql(onUpdatePlayerForId);
+const UPDATE_PLAYER = gql(updatePlayer);
 
 interface PlayerState {
   gameName: string | undefined,
+  gamePlayers : Array< {
+    __typename: "Player",
+    id: string,
+    name: string,
+    role?: string | null,
+    deceased?: boolean | null,
+    gameID: string,
+    createdAt: string,
+    updatedAt: string,
+  } | null > | null | undefined,
   id: string | undefined,
   name: string | undefined,
-  status: 'joiningGame' | 'waitingForGameToStart' | 'roundStarted' | undefined
+  status: 'joiningGame' | 'waitingForGameToStart' | 'gameStarted' | 'nightStarted' |
+    'werewolvesPick' | 'submittingWerewolfPick' | 'submittedWerewolfPick' | undefined
   role: 'villager' | 'werewolf' | undefined,
   deceased: boolean | null | undefined
 }
 
 const initialState: PlayerState = {
   gameName: undefined,
+  gamePlayers: undefined,
   id: undefined,
   name: undefined,
   status: undefined,
@@ -51,17 +66,25 @@ export const playerSlice = createSlice({
       state.name = payload.playerName;
       state.status = 'waitingForGameToStart';
     },
-    updatePlayer: (state, { payload }: PayloadAction<{ role: PlayerState['role'], deceased: PlayerState['deceased'] }>) => {
+    updatePlayerGame: (state, { payload }: PayloadAction<{ status: PlayerState['status'], players: PlayerState['gamePlayers'] }>) => {
+      state.status = payload.status;
+      state.gamePlayers = payload.players;
+    },
+    updatePlayerAttributes: (state, { payload }: PayloadAction<{ role: PlayerState['role'], deceased: PlayerState['deceased'] }>) => {
       state.role = payload.role;
       state.deceased = payload.deceased;
     }
   },
 })
 
-const { joinedGame, setStatus, updatePlayer } = playerSlice.actions;
+const { joinedGame, setStatus, updatePlayerGame, updatePlayerAttributes } = playerSlice.actions;
 
 export const selectStatus = (state: RootState) => state.player.status;
+export const selectRole = (state: RootState) => state.player.role;
 const selectId = (state: RootState) => state.player.id;
+
+export const selectAliveVillagers = (state: RootState) =>
+  state.player.gamePlayers?.filter(player => player?.role === 'villager' && player.deceased === false);
 
 export const joinGame = (gameName: string, playerName: string): AppThunk => async (
   dispatch,
@@ -105,7 +128,10 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
       console.log('Game updated', data);
       const updatedGame = data?.onUpdateGameForId;
       if (updatedGame) {
-        dispatch(setStatus(updatedGame?.status as PlayerState['status']));
+        dispatch(updatePlayerGame({
+          status: updatedGame?.status as PlayerState['status'],
+          players: updatedGame?.players?.items
+        }));
       } else {
         console.error('Error getting data from game subscription', data);
       }
@@ -126,7 +152,7 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
       console.log('Player updated', data);
       const updatedPlayer = data?.onUpdatePlayerForId;
       if (updatedPlayer) {
-        dispatch(updatePlayer({
+        dispatch(updatePlayerAttributes({
           role: updatedPlayer.role as PlayerState['role'],
           deceased: updatedPlayer.deceased
         }));
@@ -138,6 +164,30 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
       console.error('Error on player subscription', e);
     }
   });
+};
+
+export const submitWerewolfPick = (pick: string): AppThunk => async (
+  dispatch,
+  getState,
+  client
+) => {
+  console.log('Submitting werewolf pick', pick);
+
+  dispatch(setStatus('submittingWerewolfPick'));
+  
+  const submitWerewolfPickResponse = await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
+    mutation: UPDATE_PLAYER,
+    variables: {
+      input: {
+        id: selectId(getState()) as string,
+        pick
+      }
+    }
+  });
+
+  console.log('Submitted werewolf pick', submitWerewolfPickResponse);
+
+  dispatch(setStatus('submittedWerewolfPick'));
 };
 
 export default playerSlice.reducer;
