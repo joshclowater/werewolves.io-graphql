@@ -53,6 +53,8 @@ const initialState: PlayerState = {
   deceased: undefined
 }
 
+// Slice/Reducers
+
 export const playerSlice = createSlice({
   name: 'player',
   initialState,
@@ -79,12 +81,18 @@ export const playerSlice = createSlice({
 
 const { joinedGame, setStatus, updatePlayerGame, updatePlayerAttributes } = playerSlice.actions;
 
+export default playerSlice.reducer;
+
+// Selectors
+
+const selectId = (state: RootState) => state.player.id;
 export const selectStatus = (state: RootState) => state.player.status;
 export const selectRole = (state: RootState) => state.player.role;
-const selectId = (state: RootState) => state.player.id;
 
 export const selectAliveVillagers = (state: RootState) =>
   state.player.gamePlayers?.filter(player => player?.role === 'villager' && player.deceased === false);
+
+// Thunks
 
 export const joinGame = (gameName: string, playerName: string): AppThunk => async (
   dispatch,
@@ -161,7 +169,7 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
       }
     },
     error: (e) => {
-      console.error('Error on player subscription', e);
+      console.error(`Error on player subscription ${playerId}`, e);
     }
   });
 };
@@ -189,5 +197,3 @@ export const submitWerewolfPick = (pick: string): AppThunk => async (
 
   dispatch(setStatus('submittedWerewolfPick'));
 };
-
-export default playerSlice.reducer;

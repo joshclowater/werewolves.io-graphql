@@ -9,19 +9,23 @@ import {
   UpdateGameMutationVariables,
   OnCreatePlayerForGameSubscription,
   OnCreatePlayerForGameSubscriptionVariables,
+  OnUpdatePlayerForIdSubscription,
+  OnUpdatePlayerForIdSubscriptionVariables,
   UpdatePlayerMutation,
   UpdatePlayerMutationVariables
 } from "../../API";
 import { createGame as createGameMutation, updateGame, updatePlayer } from "../../graphql/mutations";
-import { onCreatePlayerForGame } from "../../graphql/subscriptions";
+import { onCreatePlayerForGame, onUpdatePlayerForId } from "../../graphql/subscriptions";
 import { timeout } from '../../utils/Time';
 
 const CREATE_GAME = gql(createGameMutation);
 const UPDATE_GAME = gql(updateGame);
 const ON_CREATE_PLAYER_FOR_GAME = gql(onCreatePlayerForGame);
+const ON_UPDATE_PLAYER_FOR_ID = gql(onUpdatePlayerForId);
 const UPDATE_PLAYER = gql(updatePlayer);
 
-let newPlayerForGameSubscription: ZenObservable.Subscription;
+// let newPlayerForGameSubscription: ZenObservable.Subscription;
+// let updatePlayerSubsctiptions: ZenObservable.Subscription[] = [];
 
 interface HostState {
   id: string | undefined,
@@ -36,6 +40,8 @@ const initialState: HostState = {
   status: undefined,
   players: {}
 }
+
+// Slice/Reducers
 
 export const hostSlice = createSlice({
   name: 'host',
@@ -56,14 +62,30 @@ export const hostSlice = createSlice({
         throw new Error(`Expected player to have id: ${JSON.stringify(payload)}`);
       }
     },
+    updatePlayerAttributes: (state: HostState, { payload }: PayloadAction<{ playerId: string, role: Player['role'], pick: Player['pick'] }>) => {
+      if (payload.playerId) {
+        state.players[payload.playerId].role = payload.role;
+        state.players[payload.playerId].pick = payload.pick;
+      } else {
+        throw new Error(`Could not update attributes on player: ${JSON.stringify(payload)}`);
+      }
+    }
   },
 })
 
-const { setStatus, createdGame, addPlayer } = hostSlice.actions;
+const { setStatus, createdGame, addPlayer, updatePlayerAttributes } = hostSlice.actions;
+
+export default hostSlice.reducer;
+
+// Selectors
 
 const selectId = (state: RootState) => state.host.id;
 export const selectStatus = (state: RootState) => state.host.status;
 export const selectPlayers = (state: RootState) => state.host.players;
+
+const selectWerewolves = (state: RootState) => Object.values(state.host.players).filter(player => player.role === 'werewolf');
+
+// Thunks
 
 export const createGame = (name: string): AppThunk => async (
   dispatch,
@@ -84,7 +106,8 @@ export const createGame = (name: string): AppThunk => async (
     return;
   }
 
-  newPlayerForGameSubscription = client.subscribe<OnCreatePlayerForGameSubscription, OnCreatePlayerForGameSubscriptionVariables>({
+  // newPlayerForGameSubscription = 
+  client.subscribe<OnCreatePlayerForGameSubscription, OnCreatePlayerForGameSubscriptionVariables>({
     query: ON_CREATE_PLAYER_FOR_GAME,
     variables: {
       gameID: game.id
@@ -113,7 +136,9 @@ export const startGame = (): AppThunk => async (
 ) => {
   dispatch(setStatus('startingGame'));
 
-  newPlayerForGameSubscription.unsubscribe();
+  // newPlayerForGameSubscription.unsubscribe();
+  // It would be nice to unsubscribe here since we no longer care about subsequent players being addded,
+  // but if we do that then subsequent subscriptions to player updates close after a second :(
   
   const villagers = Object.keys(selectPlayers(getState()));
   let werewolves: string[] = [];
@@ -124,21 +149,61 @@ export const startGame = (): AppThunk => async (
     werewolves = werewolves.concat(wolf);
   }
 
-  werewolves.forEach(werewolfPlayerId => {
-    client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
+  await Promise.all(werewolves.map(async (werewolfPlayerId) => {
+    console.log('Updating werewolfPlayerId as a werewolf', werewolfPlayerId);
+    await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
       mutation: UPDATE_PLAYER,
       variables: { input: { id: werewolfPlayerId, role: 'werewolf', deceased: false } }
     });
-  });
+
+    console.log('Subscribing to werewolfPlayerId', werewolfPlayerId);
+    client.subscribe<OnUpdatePlayerForIdSubscription, OnUpdatePlayerForIdSubscriptionVariables>({
+      query: ON_UPDATE_PLAYER_FOR_ID,
+      variables: { id: werewolfPlayerId }
+    }).subscribe({
+      next: ({ data }) => {
+        console.log('Player updated', data);
+        const updatedPlayer = data?.onUpdatePlayerForId;
+        if (updatedPlayer) {
+          console.log('Werewolf submitted pick', werewolfPlayerId, updatedPlayer.pick)
+          dispatch(updatePlayerAttributes({
+            playerId: werewolfPlayerId,
+            role: updatedPlayer.role,
+            pick: updatedPlayer.pick
+          }));
+          const status = selectStatus(getState());
+          if (status === 'werewolvesPick') {
+            const werewolves = selectWerewolves(getState());
+            const allWerewolvesSubmittedPicks = werewolves.filter(werewolf => !werewolf.pick).length === 0;
+            const allWerewolvesPicksAreTheSame = werewolves.every(
+              (werewolf, i, arr) => werewolf.pick === arr[0].pick
+            )
+            if (allWerewolvesSubmittedPicks && allWerewolvesPicksAreTheSame) {
+              console.log('TODO werewolves picked the same', werewolves[0].pick);
+              // TODO next update player as deceased
+            }
+            // TODO next update game status to day
+
+          }
+        } else {
+          console.error('Error getting data from player subscription', data);
+        }
+      },
+      error: (e) => {
+        console.error(`Error on player subscription ${werewolfPlayerId}`, e);
+      }
+    });
+  }));
 
   villagers.forEach(villagerPlayerId => {
+    console.log('Updating villagerPlayerId as a villager', villagerPlayerId);
     client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
       mutation: UPDATE_PLAYER,
       variables: { input: { id: villagerPlayerId, role: 'villager', deceased: false } }
     });
-  });
 
-  // TODO subscribe to each player updates
+    // TODO later, subscribe to player updates here too
+  });
 
   const gameId = selectId(getState()) as string;
   const startGameResponse = await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
@@ -166,5 +231,3 @@ export const startGame = (): AppThunk => async (
   console.log('Werewolves pick', werewolvesPickResponse);
   dispatch(setStatus('werewolvesPick'));
 }
-
-export default hostSlice.reducer;

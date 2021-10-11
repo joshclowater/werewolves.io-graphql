@@ -2,7 +2,7 @@
 
 ## Backend
 
-The backend of the project uses [AWS Amplify](https://docs.amplify.aws/lib/graphqlapi/getting-started/q/platform/js/) for its GraphQL implementation. [Install the Amplify CLI](https://docs.amplify.aws/cli/start/install/) and make updates by running the command below from the root of the project folder.
+The backend of the project uses [AWS Amplify](https://docs.amplify.aws/lib/graphqlapi/getting-started/q/platform/js/) for its GraphQL implementation. [Install the Amplify CLI](https://docs.amplify.aws/cli/start/install/) and make updates by running the commands below from the root of the project folder:
 
 ```
 amplify pull --appId d1hs8ia0wm3zp2 --envName dev
@@ -11,7 +11,7 @@ amplify push
 
 ## UI
 
-The UI for this project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) with the [Redux TypeScript template](https://github.com/reduxjs/cra-template-redux-typescript).
+The UI for this project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and the [Redux TypeScript template](https://github.com/reduxjs/cra-template-redux-typescript).
 
 ### Available Scripts
 
