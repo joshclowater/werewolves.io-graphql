@@ -24,7 +24,7 @@ const Player = () => {
     return <WerewolfPick />;
   } else if (status === 'submittedWerewolfPick' || status === 'submittedVillagerPick') {
     return <div>Submitted pick.</div>
-  } else if (status === 'day') {
+  } else if (status === 'day' || status === 'submittingVilllagerPick') {
     return <VillagerPick />;
   }
   return <div>Unexpected state. status: {status}, role: {role}, deceased: {deceased}</div>;

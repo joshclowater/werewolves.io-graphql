@@ -17,6 +17,7 @@ import {
 import { createGame as createGameMutation, updateGame, updatePlayer } from "../../graphql/mutations";
 import { onCreatePlayerForGame, onUpdatePlayerForId } from "../../graphql/subscriptions";
 import { timeout } from '../../utils/Time';
+import { modeOfArray } from '../../utils/Statistics';
 
 const CREATE_GAME = gql(createGameMutation);
 const UPDATE_GAME = gql(updateGame);
@@ -65,10 +66,11 @@ export const hostSlice = createSlice({
         throw new Error(`Expected player to have id: ${JSON.stringify(payload)}`);
       }
     },
-    updatePlayerAttributes: (state, { payload }: PayloadAction<{ playerId: string, role: Player['role'], pick: Player['pick'] }>) => {
+    updatePlayerAttributes: (state, { payload }: PayloadAction<{ playerId: string, role: Player['role'], pick: Player['pick'], deceased: Player['deceased'] }>) => {
       if (payload.playerId) {
         state.players[payload.playerId].role = payload.role;
         state.players[payload.playerId].pick = payload.pick;
+        state.players[payload.playerId].deceased = payload.deceased;
       } else {
         throw new Error(`Could not update attributes on player: ${JSON.stringify(payload)}`);
       }
@@ -87,12 +89,21 @@ export default hostSlice.reducer;
 
 const selectId = (state: RootState) => state.host.id;
 export const selectStatus = (state: RootState) => state.host.status;
-export const selectPlayers = (state: RootState) => state.host.players;
+export const selectPlayers = (state: RootState) => Object.values(state.host.players);
+export const selectPlayerIds = (state: RootState) => Object.keys(state.host.players);
 export const selectNewlyDeceased = (state: RootState) => state.host.newlyDeceased;
+
 const selectWerewolves = (state: RootState) =>
-  Object.values(state.host.players).filter(player => player.role === 'werewolf');
+  selectPlayers(state).filter(player => player.role === 'werewolf');
+
 const selectPlayerIdWithName = (state: RootState, playerId: string) =>
-  Object.values(state.host.players).find(player => player.name === playerId)?.id;
+  selectPlayers(state).find(player => player.name === playerId)?.id;
+
+const selectAllAliveVillagers = (state: RootState) =>
+  selectPlayers(state).filter(player => player.deceased === false);
+
+const selectAllAliveVillagersWhoSubmittedPicks = (state: RootState) =>
+  selectAllAliveVillagers(state).filter(player => player.pick);
 
 // Thunks
 
@@ -149,22 +160,16 @@ export const startGame = (): AppThunk => async (
   // It would be nice to unsubscribe here since we no longer care about subsequent players being addded,
   // but if we do that then subsequent subscriptions to player updates close after a second :(
   
-  const villagers = Object.keys(selectPlayers(getState()));
+  const villagerIds = selectPlayerIds(getState());
   let werewolfIds: string[] = [];
-  let numberOfWerewolves = (villagers.length > 6) ? 2 : 1;
+  let numberOfWerewolves = (villagerIds.length > 6) ? 2 : 1;
   
   for (numberOfWerewolves; numberOfWerewolves > 0; numberOfWerewolves--) {
-    const wolf = villagers.splice(Math.floor(Math.random() * villagers.length), 1);
+    const wolf = villagerIds.splice(Math.floor(Math.random() * villagerIds.length), 1);
     werewolfIds = werewolfIds.concat(wolf);
   }
 
   await Promise.all(werewolfIds.map(async (werewolfPlayerId) => {
-    console.log('Updating werewolfPlayerId as a werewolf', werewolfPlayerId);
-    await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
-      mutation: UPDATE_PLAYER,
-      variables: { input: { id: werewolfPlayerId, role: 'werewolf', deceased: false } }
-    });
-
     console.log('Subscribing to werewolfPlayerId', werewolfPlayerId);
     client.subscribe<OnUpdatePlayerForIdSubscription, OnUpdatePlayerForIdSubscriptionVariables>({
       query: ON_UPDATE_PLAYER_FOR_ID,
@@ -181,10 +186,14 @@ export const startGame = (): AppThunk => async (
         dispatch(updatePlayerAttributes({
           playerId: werewolfPlayerId,
           role: updatedPlayer.role,
-          pick: updatedPlayer.pick
+          pick: updatedPlayer.pick,
+          deceased: updatedPlayer.deceased,
         }));
         const status = selectStatus(getState());
-        if (status === 'werewolvesPick') {
+        if (status === 'startingGame') {
+          console.log('initializing villager');
+        } else if (status === 'werewolvesPick') {
+          // TODO move this into separate thunk function
           console.log('werewolf submitted pick', werewolfPlayerId, updatedPlayer);
           const werewolves = selectWerewolves(getState());
           const allWerewolvesSubmittedPicks = werewolves.filter(werewolf => !werewolf.pick).length === 0;
@@ -232,10 +241,10 @@ export const startGame = (): AppThunk => async (
             console.log('still waiting for werewolf(s) to submit pick before ending werewolf pick phase');
           }
         } else if (status === 'werewolvesPickEnd') {
-          console.log('presumably clearing werewolf pick during "werewolvesPickEnd" phase', werewolfPlayerId, updatedPlayer.pick);
+          console.log('clearing werewolf pick during "werewolvesPickEnd" phase', werewolfPlayerId, updatedPlayer.pick);
         } else if (status === 'day') {
           console.log('setting villager (werewolf) pick during "day" phase', werewolfPlayerId, updatedPlayer.pick);
-          // TODO next handle villager pick logic
+          dispatch(handleVillagerPick());
         } else {
           console.warn('received werewolf pick at unexpected status', status, werewolfPlayerId, updatedPlayer.pick);
         }
@@ -244,15 +253,15 @@ export const startGame = (): AppThunk => async (
         console.error(`Error on player subscription ${werewolfPlayerId}`, e);
       }
     });
-  }));
 
-  await Promise.all(villagers.map(async (villagerPlayerId) => {
-    console.log('Updating villagerPlayerId as a villager', villagerPlayerId);
+    console.log('Updating werewolfPlayerId as a werewolf', werewolfPlayerId);
     await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
       mutation: UPDATE_PLAYER,
-      variables: { input: { id: villagerPlayerId, role: 'villager', deceased: false } }
+      variables: { input: { id: werewolfPlayerId, role: 'werewolf', deceased: false } }
     });
+  }));
 
+  await Promise.all(villagerIds.map(async (villagerPlayerId) => {
     console.log('Subscribing to werewolfPlayerId', villagerPlayerId);
     client.subscribe<OnUpdatePlayerForIdSubscription, OnUpdatePlayerForIdSubscriptionVariables>({
       query: ON_UPDATE_PLAYER_FOR_ID,
@@ -272,16 +281,27 @@ export const startGame = (): AppThunk => async (
         dispatch(updatePlayerAttributes({
           playerId: villagerPlayerId,
           role: updatedPlayer.role,
-          pick: updatedPlayer.pick
+          pick: updatedPlayer.pick,
+          deceased: updatedPlayer.deceased,
         }));
         const status = selectStatus(getState());
-        if (status === 'day') {
+        if (status === 'startingGame') {
+          console.log('initializing villager');
+        } else if (status === 'werewolvesPick') {
+          console.log('setting villager as dead', villagerPlayerId, updatedPlayer.deceased);
+        } else if (status === 'day') {
           console.log('setting villager pick during "day" phase', villagerPlayerId, updatedPlayer.pick);
-          // TODO next handle villager pick logic
+          dispatch(handleVillagerPick());
         } else {
           console.warn('received villager pick at unexpected status', status, villagerPlayerId, updatedPlayer.pick);
         }
       },
+    });
+
+    console.log('Updating villagerPlayerId as a villager', villagerPlayerId);
+    await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
+      mutation: UPDATE_PLAYER,
+      variables: { input: { id: villagerPlayerId, role: 'villager', deceased: false } }
     });
   }));
 
@@ -311,3 +331,29 @@ export const startGame = (): AppThunk => async (
   console.log('Werewolves pick', werewolvesPickResponse);
   dispatch(setStatus('werewolvesPick'));
 }
+
+export const handleVillagerPick = (): AppThunk => async (
+  dispatch,
+  getState,
+  client
+) => {
+  const alivePlayers = selectAllAliveVillagers(getState());
+  const alivePlayersWhoSubmittedPicks = selectAllAliveVillagersWhoSubmittedPicks(getState());
+
+  if (alivePlayers.length === alivePlayersWhoSubmittedPicks.length) {
+    console.log('all villagers submitted picks');
+    
+    const villagerPicks = alivePlayersWhoSubmittedPicks.map(player => player.pick) as string[];
+    const topVillagerPicks = modeOfArray(villagerPicks);
+
+    console.log('topVillagerPicks', topVillagerPicks);
+
+    if (topVillagerPicks.length === 1) {
+      // TODO here
+    }
+
+    // TODO next end game conditions
+  } else {
+    console.log('still waiting for villager(s) to submit pick before ending day');
+  }
+};
