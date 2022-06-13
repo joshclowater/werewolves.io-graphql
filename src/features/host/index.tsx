@@ -1,8 +1,8 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectStatus } from './hostSlice';
 import CreateGame from './CreateGame';
 import WaitingForPlayers from './WaitingForPlayers';
+import DeceasedResults from './DeceasedResults';
 
 const Host = () => {
   const status = useSelector(selectStatus);
@@ -17,9 +17,12 @@ const Host = () => {
     return <div>Everyone close their eyes. Night will begin in five seconds.</div>;
   } else if (status === 'werewolvesPick') {
     return <div>Werewolves open your eyes and decide who you are going to kill.</div>;
-  } else {
-    throw new Error(`Unexpected status: ${status}`);
+  } else if (status === 'werewolvesPickEnd') {
+    return <div>Werewolves close your eyes. Night will continue in five seconds.</div>;
+  } else if (status === 'day') {
+    return <DeceasedResults />;
   }
+  return <div>Unexpected status: {status}</div>;
 }
 
 export default Host;

@@ -1,13 +1,14 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectStatus, selectRole } from './playerSlice';
+import { selectStatus, selectRole, selectDeceased } from './playerSlice';
 import JoinGame from './JoinGame';
 import Role from './Role';
 import WerewolfPick from './WerewolfPick';
+import VillagerPick from './VillagerPick';
 
 const Player = () => {
   const status = useSelector(selectStatus);
   const role = useSelector(selectRole);
+  const deceased = useSelector(selectDeceased);
 
   if (!status || status === 'joiningGame') {
     return <JoinGame />;
@@ -15,15 +16,18 @@ const Player = () => {
     return <div>Connected. Waiting for game to start.</div>;
   } else if (status === 'gameStarted') {
     return <Role />;
-  } else if (status === 'nightStarted' || (status === 'werewolvesPick' && role === 'villager')) {
+  } else if (deceased) {
+    return <div>You are dead.</div>;;
+  } else if (status === 'nightStarted' || status === 'werewolvesPickEnd' || (role === 'villager' && status === 'werewolvesPick')) {
     return <div>Close your eyes until you are told to open them again.</div>;
-  } else if ((status === 'werewolvesPick' || status === 'submittingWerewolfPick') && role === 'werewolf') {
+  } else if (role === 'werewolf' && (status === 'werewolvesPick' || status === 'submittingWerewolfPick')) {
     return <WerewolfPick />;
-  } else if (status === 'submittedWerewolfPick') {
+  } else if (status === 'submittedWerewolfPick' || status === 'submittedVillagerPick') {
     return <div>Submitted pick.</div>
-  } else {
-    throw new Error(`Unexpected. status: ${status}, role: ${role}`);
+  } else if (status === 'day') {
+    return <VillagerPick />;
   }
+  return <div>Unexpected state. status: {status}, role: {role}, deceased: {deceased}</div>;
 }
 
 export default Player;

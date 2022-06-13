@@ -3,7 +3,7 @@ import {
   ApolloClient,
   InMemoryCache,
 } from "@apollo/client";
-import client from '../GraphQlClient';
+import client from '../GraphQLClient';
 import host from '../features/host/hostSlice';
 import player from '../features/player/playerSlice';
 

@@ -37,8 +37,9 @@ interface PlayerState {
   } | null > | null | undefined,
   id: string | undefined,
   name: string | undefined,
-  status: 'joiningGame' | 'waitingForGameToStart' | 'gameStarted' | 'nightStarted' |
-    'werewolvesPick' | 'submittingWerewolfPick' | 'submittedWerewolfPick' | undefined
+  status: 'joiningGame' | 'waitingForGameToStart' | 'gameStarted' | 'nightStarted' | 
+    'werewolvesPick' | 'submittingWerewolfPick' | 'submittedWerewolfPick' | 'werewolvesPickEnd' | 
+    'day' | 'submittingVilllagerPick' | 'submittedVillagerPick' | undefined
   role: 'villager' | 'werewolf' | undefined,
   deceased: boolean | null | undefined
 }
@@ -88,9 +89,13 @@ export default playerSlice.reducer;
 const selectId = (state: RootState) => state.player.id;
 export const selectStatus = (state: RootState) => state.player.status;
 export const selectRole = (state: RootState) => state.player.role;
+export const selectDeceased = (state: RootState) => state.player.deceased;
 
 export const selectAliveVillagers = (state: RootState) =>
   state.player.gamePlayers?.filter(player => player?.role === 'villager' && player.deceased === false);
+
+export const selectAliveAll = (state: RootState) =>
+  state.player.gamePlayers?.filter(player => player?.deceased === false && player.id !== state.player.id);
 
 // Thunks
 
@@ -121,12 +126,21 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
     // WBN error handling
   }
 
+  console.log('game', game);
+
+  if (game.status !== 'waitingForPlayers') {
+    console.error('game is not accepting players', gameName);
+    return;
+    // WBN error handling
+  }
+
   const createPlayerResponse = await client.mutate<CreatePlayerMutation, CreatePlayerMutationVariables>({
     mutation: CREATE_PLAYER,
     variables: { input: { gameID: game.id, name: playerName }},
   });
   console.log('Created Player', createPlayerResponse);
-  dispatch(joinedGame({ gameName, playerName, playerId: createPlayerResponse?.data?.createPlayer?.id as string }));
+  const playerId = createPlayerResponse?.data?.createPlayer?.id as string;
+  dispatch(joinedGame({ gameName, playerName, playerId }));
 
   client.subscribe<OnUpdateGameForIdSubscription, OnUpdateGameForIdSubscriptionVariables>({
     query: ON_UPDATE_GAME_FOR_ID,
@@ -151,7 +165,6 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
   // WBN do this when game ends
   // updateGameSubscription.unsubscribe();
 
-  const playerId = selectId(getState());
   client.subscribe<OnUpdatePlayerForIdSubscription, OnUpdatePlayerForIdSubscriptionVariables>({
     query: ON_UPDATE_PLAYER_FOR_ID,
     variables: { id: playerId }
@@ -196,4 +209,28 @@ export const submitWerewolfPick = (pick: string): AppThunk => async (
   console.log('Submitted werewolf pick', submitWerewolfPickResponse);
 
   dispatch(setStatus('submittedWerewolfPick'));
+};
+
+export const submitVillagerPick = (pick: string): AppThunk => async (
+  dispatch,
+  getState,
+  client
+) => {
+  console.log('Submitting villager pick', pick);
+
+  dispatch(setStatus('submittingVilllagerPick'));
+  
+  const submitVillagerPickResponse = await client.mutate<UpdatePlayerMutation, UpdatePlayerMutationVariables>({
+    mutation: UPDATE_PLAYER,
+    variables: {
+      input: {
+        id: selectId(getState()) as string,
+        pick
+      }
+    }
+  });
+
+  console.log('Submitted villager pick', submitVillagerPickResponse);
+
+  dispatch(setStatus('submittedVillagerPick'));
 };

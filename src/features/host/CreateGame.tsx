@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createGame } from './hostSlice';
 
@@ -22,7 +22,7 @@ const CreateGame = () => {
       />
       <button type="submit">Submit</button>
     </form>
-    {/* WBN in progress, error states */}
+    {/* WBN 'creatingGame' in progress, error states */}
   </>);
 }
 
