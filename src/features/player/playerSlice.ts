@@ -39,7 +39,8 @@ interface PlayerState {
   name: string | undefined,
   status: 'joiningGame' | 'waitingForGameToStart' | 'gameStarted' | 'nightStarted' | 
     'werewolvesPick' | 'submittingWerewolfPick' | 'submittedWerewolfPick' | 'werewolvesPickEnd' | 
-    'day' | 'submittingVilllagerPick' | 'submittedVillagerPick' | undefined
+    'day' | 'submittingVilllagerPick' | 'submittedVillagerPick' | 'dayEnd' | 
+    'werewolvesWin' | 'villagersWin' | undefined,
   role: 'villager' | 'werewolf' | undefined,
   deceased: boolean | null | undefined
 }

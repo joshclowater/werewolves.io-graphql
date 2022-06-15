@@ -3,6 +3,7 @@ import { selectStatus } from './hostSlice';
 import CreateGame from './CreateGame';
 import WaitingForPlayers from './WaitingForPlayers';
 import DeceasedResults from './DeceasedResults';
+import GameOver from './GameOver';
 
 const Host = () => {
   const status = useSelector(selectStatus);
@@ -19,8 +20,10 @@ const Host = () => {
     return <div>Werewolves open your eyes and decide who you are going to kill.</div>;
   } else if (status === 'werewolvesPickEnd') {
     return <div>Werewolves close your eyes. Night will continue in five seconds.</div>;
-  } else if (status === 'day') {
+  } else if (status === 'day' || status === 'dayEndPending' || status === 'dayEnd') {
     return <DeceasedResults />;
+  } else if (status === 'werewolvesWin' || status === 'villagersWin') {
+    return <GameOver />;
   }
   return <div>Unexpected status: {status}</div>;
 }

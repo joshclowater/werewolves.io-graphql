@@ -4,6 +4,7 @@ import JoinGame from './JoinGame';
 import Role from './Role';
 import WerewolfPick from './WerewolfPick';
 import VillagerPick from './VillagerPick';
+import GameOver from './GameOver';
 
 const Player = () => {
   const status = useSelector(selectStatus);
@@ -16,8 +17,10 @@ const Player = () => {
     return <div>Connected. Waiting for game to start.</div>;
   } else if (status === 'gameStarted') {
     return <Role />;
+  } else if (status === 'villagersWin' || status === 'werewolvesWin') {
+    return <GameOver />;
   } else if (deceased) {
-    return <div>You are dead.</div>;;
+    return <div>You are dead.</div>;
   } else if (status === 'nightStarted' || status === 'werewolvesPickEnd' || (role === 'villager' && status === 'werewolvesPick')) {
     return <div>Close your eyes until you are told to open them again.</div>;
   } else if (role === 'werewolf' && (status === 'werewolvesPick' || status === 'submittingWerewolfPick')) {
@@ -26,6 +29,8 @@ const Player = () => {
     return <div>Submitted pick.</div>
   } else if (status === 'day' || status === 'submittingVilllagerPick') {
     return <VillagerPick />;
+  } else if (status === 'dayEnd') {
+    return <div>The day has ended. Showing results.</div>;
   }
   return <div>Unexpected state. status: {status}, role: {role}, deceased: {deceased}</div>;
 }

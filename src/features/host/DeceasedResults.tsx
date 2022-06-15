@@ -1,20 +1,32 @@
 import { useSelector } from 'react-redux';
-import { selectNewlyDeceased, selectStatus } from './hostSlice';
+import { selectAllAlivePlayers, selectAllDeceasedPlayers, selectNewlyDeceased, selectStatus } from './hostSlice';
 
 const DeceasedResults = () => {
   const status = useSelector(selectStatus);
   const newlyDeceased = useSelector(selectNewlyDeceased);
+  const allDeceased = useSelector(selectAllDeceasedPlayers);
+  const allLiving = useSelector(selectAllAlivePlayers);
 
   return (
     <div>
       <div>
-        Killed by werewolves:
+        <div>Killed by {status === 'dayEnd' ? 'villagers' : 'werewolves'}:</div>
         <div>{newlyDeceased}</div>
       </div>
-      <br />
-      {/* TODO all deceased */}
-      {/* TODO all remaining living */}
-      {status === 'day' &&
+      {allDeceased.length > 1 &&
+        <div>
+          <div>All deceased villagers:</div>
+          {allDeceased.map(player =>
+            <div key={player.id}>{player.name}</div>
+          )}
+        </div>}
+      <div>
+        <div>All remaining living villagers:</div>
+        {allLiving.map(player =>
+          <div key={player.id}>{player.name}</div>
+        )}
+      </div>
+      {(status === 'day' || status === 'dayEndPending') &&
         <div>
           {`All remaining living members of the village can discuss who they think the werewolf is. 
             Vote on who you think is a werewolf.
