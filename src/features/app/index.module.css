@@ -1,0 +1,23 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.Logo {
+  height: 16vh;
+  margin-top: 3vh;
+}
+
+.Buttons {
+  margin: 10vh 0;
+}
+
+.Button {
+  margin: 0 2vw;
+}
+
+.Footer {
+  margin: auto 5vw 1vh;
+  font-size: 1.2vh;
+}

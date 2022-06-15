@@ -5,7 +5,7 @@ import { ApolloProvider } from "@apollo/client";
 import { store } from './redux/store';
 import client from './GraphQLClient';
 import './index.css';
-import App from './App';
+import App from './features/app';
 
 ReactDOM.render(
   <React.StrictMode>
