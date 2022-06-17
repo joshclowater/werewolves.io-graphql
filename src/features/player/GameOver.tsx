@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { selectRole, selectStatus } from './playerSlice';
+import globalStyles from 'index.module.css';
 
 const GameOver = () => {
   const status = useSelector(selectStatus);
@@ -14,7 +15,7 @@ const GameOver = () => {
 
   return (
     <div>
-      <div>{message}</div>
+      <div className={globalStyles.bottomSpace}>{message}</div>
       <button onClick={() => window.location.reload()}>
         Play again?
       </button>

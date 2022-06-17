@@ -1,0 +1,17 @@
+.Wrapper {
+  height: 60vh;
+}
+
+.GameInfo {
+  margin-bottom: 3vh;
+}
+
+.GameId {
+  font-size: 8vh;
+  margin-bottom: 3vh;
+}
+
+.PlayersHeader {
+  font-size: 3.5vh;
+  margin-bottom: 1vh;
+}

@@ -89,6 +89,7 @@ export default hostSlice.reducer;
 // Selectors
 
 const selectId = (state: RootState) => state.host.id;
+export const selectName = (state: RootState) => state.host.name;
 export const selectStatus = (state: RootState) => state.host.status;
 export const selectPlayers = (state: RootState) => Object.values(state.host.players);
 export const selectPlayerIds = (state: RootState) => Object.keys(state.host.players);
@@ -114,12 +115,16 @@ const selectPlayerIdWithName = (state: RootState, name: string) =>
 
 // Thunks
 
-export const createGame = (name: string): AppThunk => async (
+export const createGame = (): AppThunk => async (
   dispatch,
   _getState,
   client
 ) => {
   dispatch(setStatus('creatingGame'));
+  const name = makeId();
+
+  // TODO validate game doesn't exist with name. if it does, try again with new name.
+
   const response = await client.mutate<CreateGameMutation, CreateGameMutationVariables>({
     mutation: CREATE_GAME,
     variables: { input: { name, status: 'waitingForPlayers' } }
@@ -436,4 +441,18 @@ export const handleVillagerPick = (): AppThunk => async (
     console.log('Started werewolves pick');
     dispatch(setStatus('werewolvesPick'));
   }
+};
+
+// Utils
+
+/**
+ * @returns 5 character string made of alphabet characters 
+ */
+const makeId = () => {
+  let id = '';
+  const possible = 'abcdefghijklmnopqrstuvwxyz';
+  for (var i = 0; i < 5; i++) {
+    id += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return id;
 };

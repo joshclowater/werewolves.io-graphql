@@ -5,34 +5,39 @@ import Role from './Role';
 import WerewolfPick from './WerewolfPick';
 import VillagerPick from './VillagerPick';
 import GameOver from './GameOver';
+import globalStyles from 'index.module.css';
 
 const Player = () => {
   const status = useSelector(selectStatus);
   const role = useSelector(selectRole);
   const deceased = useSelector(selectDeceased);
 
+  let content;
   if (!status || status === 'joiningGame') {
-    return <JoinGame />;
+    content = <JoinGame />;
   } else if (status === 'waitingForGameToStart') {
-    return <div>Connected. Waiting for game to start.</div>;
+    content = <div>Connected. Waiting for game to start.</div>;
   } else if (status === 'gameStarted') {
-    return <Role />;
+    content = <Role />;
   } else if (status === 'villagersWin' || status === 'werewolvesWin') {
-    return <GameOver />;
+    content = <GameOver />;
   } else if (deceased) {
-    return <div>You are dead.</div>;
+    content = <div>You are dead.</div>;
   } else if (status === 'nightStarted' || status === 'werewolvesPickEnd' || (role === 'villager' && status === 'werewolvesPick')) {
-    return <div>Close your eyes until you are told to open them again.</div>;
+    content = <div>Close your eyes until you are told to open them again.</div>;
   } else if (role === 'werewolf' && (status === 'werewolvesPick' || status === 'submittingWerewolfPick')) {
-    return <WerewolfPick />;
+    content = <WerewolfPick />;
   } else if (status === 'submittedWerewolfPick' || status === 'submittedVillagerPick') {
-    return <div>Submitted pick.</div>
+    content = <div>Submitted pick.</div>
   } else if (status === 'day' || status === 'submittingVilllagerPick') {
-    return <VillagerPick />;
+    content = <VillagerPick />;
   } else if (status === 'dayEnd') {
-    return <div>The day has ended. Showing results.</div>;
+    content = <div>The day has ended. Showing results.</div>;
+  } else {
+    content = <div>Unexpected state. status: {status}, role: {role}, deceased: {deceased}</div>;
   }
-  return <div>Unexpected state. status: {status}, role: {role}, deceased: {deceased}</div>;
+
+  return <div className={globalStyles.CenteredScreen}>{content}</div>;
 }
 
 export default Player;

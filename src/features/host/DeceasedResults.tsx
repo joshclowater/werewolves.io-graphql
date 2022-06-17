@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { selectAllAlivePlayers, selectAllDeceasedPlayers, selectNewlyDeceased, selectStatus } from './hostSlice';
+import globalStyles from 'index.module.css';
 
 const DeceasedResults = () => {
   const status = useSelector(selectStatus);
@@ -9,18 +10,18 @@ const DeceasedResults = () => {
 
   return (
     <div>
-      <div>
-        <div>Killed by {status === 'dayEnd' ? 'villagers' : 'werewolves'}:</div>
+      <div className={globalStyles.bottomSpace}>
+        <div>Killed by {status === 'dayEnd' ? 'villagers today' : 'werewolves last night'}:</div>
         <div>{newlyDeceased}</div>
       </div>
       {allDeceased.length > 1 &&
-        <div>
+        <div className={globalStyles.bottomSpace}>
           <div>All deceased villagers:</div>
           {allDeceased.map(player =>
             <div key={player.id}>{player.name}</div>
           )}
         </div>}
-      <div>
+      <div className={globalStyles.bottomSpace}>
         <div>All remaining living villagers:</div>
         {allLiving.map(player =>
           <div key={player.id}>{player.name}</div>

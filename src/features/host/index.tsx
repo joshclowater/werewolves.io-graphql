@@ -4,28 +4,37 @@ import CreateGame from './CreateGame';
 import WaitingForPlayers from './WaitingForPlayers';
 import DeceasedResults from './DeceasedResults';
 import GameOver from './GameOver';
+import globalStyles from 'index.module.css';
 
 const Host = () => {
   const status = useSelector(selectStatus);
 
+  let content;
   if (!status || status === 'creatingGame') {
-    return <CreateGame />;
+    content = <CreateGame />;
   } else if (status === 'waitingForPlayers' || status === 'startingGame') {
-    return <WaitingForPlayers />;
+    content = <WaitingForPlayers />;
   } else if (status === 'gameStarted') {
-    return <div>The round has started. Look at your device to see your role. Don't let anyone else see your role. Night will begin in ten seconds.</div>;
+    content = <div>The round has started. Look at your device to see your role. Don't let anyone else see your role. Night will begin in ten seconds.</div>;
   } else if (status === 'nightStarted') {
-    return <div>Everyone close their eyes. Night will begin in five seconds.</div>;
+    content = <div>Everyone close their eyes. Night will begin in five seconds.</div>;
   } else if (status === 'werewolvesPick') {
-    return <div>Werewolves open your eyes and decide who you are going to kill.</div>;
+    content = <div>Werewolves open your eyes and decide who you are going to kill.</div>;
   } else if (status === 'werewolvesPickEnd') {
-    return <div>Werewolves close your eyes. Night will continue in five seconds.</div>;
+    content = <div>Werewolves close your eyes. Night will continue in five seconds.</div>;
   } else if (status === 'day' || status === 'dayEndPending' || status === 'dayEnd') {
-    return <DeceasedResults />;
+    content = <DeceasedResults />;
   } else if (status === 'werewolvesWin' || status === 'villagersWin') {
-    return <GameOver />;
+    content = <GameOver />;
+  } else {
+    content = <div>Unexpected status: {status}</div>;
   }
-  return <div>Unexpected status: {status}</div>;
+
+  return (
+    <div className={globalStyles.CenteredScreen}>
+      {content}
+    </div>
+  );
 }
 
 export default Host;
