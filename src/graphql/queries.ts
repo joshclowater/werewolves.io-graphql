@@ -8,6 +8,7 @@ export const getGame = /* GraphQL */ `
       id
       name
       status
+      expirationUnixTime
       players {
         items {
           id
@@ -15,6 +16,7 @@ export const getGame = /* GraphQL */ `
           role
           deceased
           pick
+          expirationUnixTime
           gameID
           createdAt
           updatedAt
@@ -37,6 +39,7 @@ export const listGames = /* GraphQL */ `
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -55,11 +58,13 @@ export const getPlayer = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -84,11 +89,13 @@ export const listPlayers = /* GraphQL */ `
         role
         deceased
         pick
+        expirationUnixTime
         gameID
         game {
           id
           name
           status
+          expirationUnixTime
           createdAt
           updatedAt
         }

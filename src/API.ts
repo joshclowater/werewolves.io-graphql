@@ -6,11 +6,13 @@ export type CreateGameInput = {
   id?: string | null,
   name: string,
   status: string,
+  expirationUnixTime: number,
 };
 
 export type ModelGameConditionInput = {
   name?: ModelStringInput | null,
   status?: ModelStringInput | null,
+  expirationUnixTime?: ModelIntInput | null,
   and?: Array< ModelGameConditionInput | null > | null,
   or?: Array< ModelGameConditionInput | null > | null,
   not?: ModelGameConditionInput | null,
@@ -56,39 +58,54 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
+export type ModelIntInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
 export type Game = {
   __typename: "Game",
-  id?: string,
-  name?: string,
-  status?: string,
-  players?: ModelPlayerConnection,
-  createdAt?: string,
-  updatedAt?: string,
+  id: string,
+  name: string,
+  status: string,
+  expirationUnixTime: number,
+  players?: ModelPlayerConnection | null,
+  createdAt: string,
+  updatedAt: string,
 };
 
 export type ModelPlayerConnection = {
   __typename: "ModelPlayerConnection",
-  items?:  Array<Player | null > | null,
+  items:  Array<Player | null >,
   nextToken?: string | null,
 };
 
 export type Player = {
   __typename: "Player",
-  id?: string,
-  name?: string,
+  id: string,
+  name: string,
   role?: string | null,
   deceased?: boolean | null,
   pick?: string | null,
-  gameID?: string,
-  game?: Game,
-  createdAt?: string,
-  updatedAt?: string,
+  expirationUnixTime: number,
+  gameID: string,
+  game?: Game | null,
+  createdAt: string,
+  updatedAt: string,
 };
 
 export type UpdateGameInput = {
   id: string,
   name?: string | null,
   status?: string | null,
+  expirationUnixTime?: number | null,
 };
 
 export type DeleteGameInput = {
@@ -101,6 +118,7 @@ export type CreatePlayerInput = {
   role?: string | null,
   deceased?: boolean | null,
   pick?: string | null,
+  expirationUnixTime: number,
   gameID: string,
 };
 
@@ -109,6 +127,7 @@ export type ModelPlayerConditionInput = {
   role?: ModelStringInput | null,
   deceased?: ModelBooleanInput | null,
   pick?: ModelStringInput | null,
+  expirationUnixTime?: ModelIntInput | null,
   gameID?: ModelIDInput | null,
   and?: Array< ModelPlayerConditionInput | null > | null,
   or?: Array< ModelPlayerConditionInput | null > | null,
@@ -144,6 +163,7 @@ export type UpdatePlayerInput = {
   role?: string | null,
   deceased?: boolean | null,
   pick?: string | null,
+  expirationUnixTime?: number | null,
   gameID?: string | null,
 };
 
@@ -155,6 +175,7 @@ export type ModelGameFilterInput = {
   id?: ModelIDInput | null,
   name?: ModelStringInput | null,
   status?: ModelStringInput | null,
+  expirationUnixTime?: ModelIntInput | null,
   and?: Array< ModelGameFilterInput | null > | null,
   or?: Array< ModelGameFilterInput | null > | null,
   not?: ModelGameFilterInput | null,
@@ -162,7 +183,7 @@ export type ModelGameFilterInput = {
 
 export type ModelGameConnection = {
   __typename: "ModelGameConnection",
-  items?:  Array<Game | null > | null,
+  items:  Array<Game | null >,
   nextToken?: string | null,
 };
 
@@ -172,6 +193,7 @@ export type ModelPlayerFilterInput = {
   role?: ModelStringInput | null,
   deceased?: ModelBooleanInput | null,
   pick?: ModelStringInput | null,
+  expirationUnixTime?: ModelIntInput | null,
   gameID?: ModelIDInput | null,
   and?: Array< ModelPlayerFilterInput | null > | null,
   or?: Array< ModelPlayerFilterInput | null > | null,
@@ -179,7 +201,7 @@ export type ModelPlayerFilterInput = {
 };
 
 export type CreateGameMutationVariables = {
-  input?: CreateGameInput,
+  input: CreateGameInput,
   condition?: ModelGameConditionInput | null,
 };
 
@@ -189,19 +211,21 @@ export type CreateGameMutation = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -210,7 +234,7 @@ export type CreateGameMutation = {
 };
 
 export type UpdateGameMutationVariables = {
-  input?: UpdateGameInput,
+  input: UpdateGameInput,
   condition?: ModelGameConditionInput | null,
 };
 
@@ -220,19 +244,21 @@ export type UpdateGameMutation = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -241,7 +267,7 @@ export type UpdateGameMutation = {
 };
 
 export type DeleteGameMutationVariables = {
-  input?: DeleteGameInput,
+  input: DeleteGameInput,
   condition?: ModelGameConditionInput | null,
 };
 
@@ -251,19 +277,21 @@ export type DeleteGameMutation = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -272,7 +300,7 @@ export type DeleteGameMutation = {
 };
 
 export type CreatePlayerMutationVariables = {
-  input?: CreatePlayerInput,
+  input: CreatePlayerInput,
   condition?: ModelPlayerConditionInput | null,
 };
 
@@ -284,12 +312,14 @@ export type CreatePlayerMutation = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -303,7 +333,7 @@ export type CreatePlayerMutation = {
 };
 
 export type UpdatePlayerMutationVariables = {
-  input?: UpdatePlayerInput,
+  input: UpdatePlayerInput,
   condition?: ModelPlayerConditionInput | null,
 };
 
@@ -315,12 +345,14 @@ export type UpdatePlayerMutation = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -334,7 +366,7 @@ export type UpdatePlayerMutation = {
 };
 
 export type DeletePlayerMutationVariables = {
-  input?: DeletePlayerInput,
+  input: DeletePlayerInput,
   condition?: ModelPlayerConditionInput | null,
 };
 
@@ -346,12 +378,14 @@ export type DeletePlayerMutation = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -365,7 +399,7 @@ export type DeletePlayerMutation = {
 };
 
 export type GetGameQueryVariables = {
-  id?: string,
+  id: string,
 };
 
 export type GetGameQuery = {
@@ -374,19 +408,21 @@ export type GetGameQuery = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -403,24 +439,25 @@ export type ListGamesQueryVariables = {
 export type ListGamesQuery = {
   listGames?:  {
     __typename: "ModelGameConnection",
-    items?:  Array< {
+    items:  Array< {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-    } | null > | null,
+    } | null >,
     nextToken?: string | null,
   } | null,
 };
 
 export type GetPlayerQueryVariables = {
-  id?: string,
+  id: string,
 };
 
 export type GetPlayerQuery = {
@@ -431,12 +468,14 @@ export type GetPlayerQuery = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -458,31 +497,33 @@ export type ListPlayersQueryVariables = {
 export type ListPlayersQuery = {
   listPlayers?:  {
     __typename: "ModelPlayerConnection",
-    items?:  Array< {
+    items:  Array< {
       __typename: "Player",
       id: string,
       name: string,
       role?: string | null,
       deceased?: boolean | null,
       pick?: string | null,
+      expirationUnixTime: number,
       gameID: string,
       game?:  {
         __typename: "Game",
         id: string,
         name: string,
         status: string,
+        expirationUnixTime: number,
         createdAt: string,
         updatedAt: string,
       } | null,
       createdAt: string,
       updatedAt: string,
-    } | null > | null,
+    } | null >,
     nextToken?: string | null,
   } | null,
 };
 
 export type OnCreatePlayerForGameSubscriptionVariables = {
-  gameID?: string,
+  gameID: string,
 };
 
 export type OnCreatePlayerForGameSubscription = {
@@ -493,12 +534,14 @@ export type OnCreatePlayerForGameSubscription = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -512,7 +555,7 @@ export type OnCreatePlayerForGameSubscription = {
 };
 
 export type OnUpdateGameForIdSubscriptionVariables = {
-  id?: string,
+  id: string,
 };
 
 export type OnUpdateGameForIdSubscription = {
@@ -521,19 +564,21 @@ export type OnUpdateGameForIdSubscription = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -542,7 +587,7 @@ export type OnUpdateGameForIdSubscription = {
 };
 
 export type OnUpdatePlayerForIdSubscriptionVariables = {
-  id?: string,
+  id: string,
 };
 
 export type OnUpdatePlayerForIdSubscription = {
@@ -553,12 +598,14 @@ export type OnUpdatePlayerForIdSubscription = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -577,19 +624,21 @@ export type OnCreateGameSubscription = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -603,19 +652,21 @@ export type OnUpdateGameSubscription = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -629,19 +680,21 @@ export type OnDeleteGameSubscription = {
     id: string,
     name: string,
     status: string,
+    expirationUnixTime: number,
     players?:  {
       __typename: "ModelPlayerConnection",
-      items?:  Array< {
+      items:  Array< {
         __typename: "Player",
         id: string,
         name: string,
         role?: string | null,
         deceased?: boolean | null,
         pick?: string | null,
+        expirationUnixTime: number,
         gameID: string,
         createdAt: string,
         updatedAt: string,
-      } | null > | null,
+      } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
@@ -657,12 +710,14 @@ export type OnCreatePlayerSubscription = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -683,12 +738,14 @@ export type OnUpdatePlayerSubscription = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,
@@ -709,12 +766,14 @@ export type OnDeletePlayerSubscription = {
     role?: string | null,
     deceased?: boolean | null,
     pick?: string | null,
+    expirationUnixTime: number,
     gameID: string,
     game?:  {
       __typename: "Game",
       id: string,
       name: string,
       status: string,
+      expirationUnixTime: number,
       players?:  {
         __typename: "ModelPlayerConnection",
         nextToken?: string | null,

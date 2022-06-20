@@ -23,7 +23,8 @@ const CreateGame = () => {
         const response = await createGame({
           variables: { input: {
             name: gameName,
-            status: 'creatingGame'
+            status: 'creatingGame',
+            expirationUnixTime: Math.floor(Date.now() / 1000) + 86400
           }},
           // refetchQueries: [{ query: LIST_GAMES }]
         });

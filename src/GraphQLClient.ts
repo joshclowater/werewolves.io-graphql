@@ -21,7 +21,17 @@ const link = ApolloLink.from([
 
 const client = new ApolloClient({
   link,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache({
+    typePolicies: {
+      Game: {
+        fields: {
+          players: {
+            merge: true,
+          }
+        }
+      }
+    }
+  })
 });
 
 export default client;

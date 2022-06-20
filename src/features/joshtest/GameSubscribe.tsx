@@ -23,7 +23,7 @@ const Game = () => {
     {loading && <div>Loading...</div>}
     {error && <div>Error! ${error.message}</div>}
     <h3>{data?.onUpdateGame?.name}</h3>
-    {data?.onUpdateGame?.players?.items?.map(player => <div key={player?.id}>{player?.name}</div>)}
+    {/* {data?.onUpdateGame?.players?.items?.map(player => <div key={player?.id}>{player?.name}</div>)} */}
   </>);
 };
 

@@ -113,7 +113,7 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
   console.log('Query game gameQueryResponse', gameQueryResponse);
   const games = gameQueryResponse?.data?.listGames?.items;
 
-  let game;
+  let game: any;
   if (games?.length && games[0]) {
     if (games.length === 1) {
       game = games[0];
@@ -137,7 +137,7 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
 
   const createPlayerResponse = await client.mutate<CreatePlayerMutation, CreatePlayerMutationVariables>({
     mutation: CREATE_PLAYER,
-    variables: { input: { gameID: game.id, name: playerName }},
+    variables: { input: { gameID: game.id, name: playerName, expirationUnixTime: Math.floor(Date.now() / 1000) + 86400 }},
   });
   console.log('Created Player', createPlayerResponse);
   const playerId = createPlayerResponse?.data?.createPlayer?.id as string;
@@ -147,17 +147,13 @@ export const joinGame = (gameName: string, playerName: string): AppThunk => asyn
     query: ON_UPDATE_GAME_FOR_ID,
     variables: { id: game.id }
   }).subscribe({
-    next: ({ data }) => {
-      console.log('Game updated', data);
+    next: async ({ data }) => {
       const updatedGame = data?.onUpdateGameForId;
-      if (updatedGame) {
-        dispatch(updatePlayerGame({
-          status: updatedGame?.status as PlayerState['status'],
-          players: updatedGame?.players?.items
-        }));
-      } else {
-        console.error('Error getting data from game subscription', data);
-      }
+      console.log('Game updated', updatedGame);
+      dispatch(updatePlayerGame({
+        status: updatedGame?.status as PlayerState['status'],
+        players: updatedGame?.players?.items
+      }));
     },
     error: (e) => {
       console.error('Error on game subscription', e);

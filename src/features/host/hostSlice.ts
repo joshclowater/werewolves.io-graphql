@@ -123,11 +123,11 @@ export const createGame = (): AppThunk => async (
   dispatch(setStatus('creatingGame'));
   const name = makeId();
 
-  // TODO validate game doesn't exist with name. if it does, try again with new name.
+  // WBN validate game doesn't exist with name. if it does, try again with new name.
 
   const response = await client.mutate<CreateGameMutation, CreateGameMutationVariables>({
     mutation: CREATE_GAME,
-    variables: { input: { name, status: 'waitingForPlayers' } }
+    variables: { input: { name, status: 'waitingForPlayers', expirationUnixTime: Math.floor(Date.now() / 1000) + 86400 } }
   });
   console.log('Created game', name);
   const game = response?.data?.createGame;

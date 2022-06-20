@@ -31,7 +31,7 @@ const AddPlayer = () => {
           if (games.length === 1) {
             const game = games[0];
             const response = await createPlayer({
-              variables: { input: { gameID: game.id, name: playerName }},
+              variables: { input: { gameID: game.id, name: playerName, expirationUnixTime: Math.floor(Date.now() / 1000) + 86400 }},
             });
             console.log('Created Player', response);
           } else {

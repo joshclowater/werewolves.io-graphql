@@ -2,6 +2,7 @@ type Game @model {
   id: ID!
   name: String!
   status: String!
+  expirationUnixTime: AWSTimestamp! @ttl
   players: [Player] @connection(keyName: "byGame", fields: ["id"])
 }
 
@@ -11,6 +12,7 @@ type Player @model @key(name: "byGame", fields: ["gameID"]) {
   role: String
   deceased: Boolean
   pick: String
+  expirationUnixTime: AWSTimestamp! @ttl
   gameID: ID!
   game: Game @connection(fields: ["gameID"])
 }

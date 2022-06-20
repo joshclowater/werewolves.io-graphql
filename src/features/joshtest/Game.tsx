@@ -18,7 +18,7 @@ const Game = () => {
     <h2>Game ea44f702-8c07-4a04-97c2-f933df526483</h2>
     {loading && <div>Loading...</div>}
     {error && <div>Error! ${error.message}</div>}
-    {data?.getGame?.players?.items?.map(player => <div key={player?.id}>{player?.name}</div>)}
+    {/* {data?.getGame?.players?.items?.map(player => <div key={player?.id}>{player?.name}</div>)} */}
   </>);
 };
 

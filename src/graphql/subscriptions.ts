@@ -10,11 +10,13 @@ export const onCreatePlayerForGame = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -32,6 +34,7 @@ export const onUpdateGameForId = /* GraphQL */ `
       id
       name
       status
+      expirationUnixTime
       players {
         items {
           id
@@ -39,6 +42,7 @@ export const onUpdateGameForId = /* GraphQL */ `
           role
           deceased
           pick
+          expirationUnixTime
           gameID
           createdAt
           updatedAt
@@ -58,11 +62,13 @@ export const onUpdatePlayerForId = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -80,6 +86,7 @@ export const onCreateGame = /* GraphQL */ `
       id
       name
       status
+      expirationUnixTime
       players {
         items {
           id
@@ -87,6 +94,7 @@ export const onCreateGame = /* GraphQL */ `
           role
           deceased
           pick
+          expirationUnixTime
           gameID
           createdAt
           updatedAt
@@ -104,6 +112,7 @@ export const onUpdateGame = /* GraphQL */ `
       id
       name
       status
+      expirationUnixTime
       players {
         items {
           id
@@ -111,6 +120,7 @@ export const onUpdateGame = /* GraphQL */ `
           role
           deceased
           pick
+          expirationUnixTime
           gameID
           createdAt
           updatedAt
@@ -128,6 +138,7 @@ export const onDeleteGame = /* GraphQL */ `
       id
       name
       status
+      expirationUnixTime
       players {
         items {
           id
@@ -135,6 +146,7 @@ export const onDeleteGame = /* GraphQL */ `
           role
           deceased
           pick
+          expirationUnixTime
           gameID
           createdAt
           updatedAt
@@ -154,11 +166,13 @@ export const onCreatePlayer = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -178,11 +192,13 @@ export const onUpdatePlayer = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
@@ -202,11 +218,13 @@ export const onDeletePlayer = /* GraphQL */ `
       role
       deceased
       pick
+      expirationUnixTime
       gameID
       game {
         id
         name
         status
+        expirationUnixTime
         players {
           nextToken
         }
