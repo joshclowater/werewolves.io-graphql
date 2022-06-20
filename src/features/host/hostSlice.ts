@@ -242,7 +242,7 @@ export const startGame = (): AppThunk => async (
               console.log('cleared werewolf pick', werewolfPlayerIdToClearPick);
             }));
 
-            await timeout(5);
+            await timeout(10);
 
             await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
               mutation: UPDATE_GAME,
@@ -333,7 +333,7 @@ export const startGame = (): AppThunk => async (
   console.log('Started game');
   dispatch(setStatus('gameStarted'));
 
-  await timeout(5); // TODO 10
+  await timeout(15);
 
   await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
     mutation: UPDATE_GAME,
@@ -342,7 +342,7 @@ export const startGame = (): AppThunk => async (
   console.log('Started night');
   dispatch(setStatus('nightStarted'));
 
-  await timeout(5);
+  await timeout(10);
 
   await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
     mutation: UPDATE_GAME,
@@ -423,7 +423,7 @@ export const handleVillagerPick = (): AppThunk => async (
       console.log('cleared villager pick', id);
     }));
 
-    await timeout(8);
+    await timeout(10);
 
     await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
       mutation: UPDATE_GAME,
@@ -432,7 +432,7 @@ export const handleVillagerPick = (): AppThunk => async (
     console.log('Started night');
     dispatch(setStatus('nightStarted'));
 
-    await timeout(5);
+    await timeout(10);
 
     await client.mutate<UpdateGameMutation, UpdateGameMutationVariables>({
       mutation: UPDATE_GAME,

@@ -9,7 +9,7 @@ const CreateGame = () => {
     dispatch(createGame());
   }, [dispatch]);
 
-  return <h2>Creating game...</h2>;
+  return <div>Creating game...</div>;
 };
 
 export default CreateGame;

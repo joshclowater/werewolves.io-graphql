@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import werewolvesWin from 'assets/sounds/werewolves-win.mp3';
+import villagersWin from 'assets/sounds/villagers-win.mp3';
 import { selectAllDeceasedPlayers, selectNewlyDeceased, selectStatus, selectVillagers, selectWerewolves } from './hostSlice';
 import globalStyles from 'index.module.css';
 
@@ -8,6 +11,14 @@ const GameOver = () => {
   const allDeceased = useSelector(selectAllDeceasedPlayers);
   const allVillagers = useSelector(selectVillagers);
   const allWerewolves = useSelector(selectWerewolves);
+
+  useEffect(() => {
+    if (status === 'werewolvesWin') {
+      new Audio(werewolvesWin).play();
+    } else {
+      new Audio(villagersWin).play();
+    }
+  }, [status]);
 
   return (
     <div>
