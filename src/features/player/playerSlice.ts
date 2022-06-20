@@ -1,10 +1,10 @@
 import { gql } from '@apollo/client';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AppThunk, RootState } from '../../redux/store';
+import type { AppThunk, RootState } from 'redux/store';
 import {
+  Player,
   CreatePlayerMutation,
   CreatePlayerMutationVariables,
-  ListGamesQuery,
   ListGamesQueryVariables,
   OnUpdateGameForIdSubscription,
   OnUpdateGameForIdSubscriptionVariables,
@@ -12,29 +12,23 @@ import {
   OnUpdatePlayerForIdSubscriptionVariables,
   UpdatePlayerMutation,
   UpdatePlayerMutationVariables
-} from "../../API";
-import { listGames } from "../../graphql/queries";
-import { createPlayer, updatePlayer } from "../../graphql/mutations";
-import { onUpdateGameForId, onUpdatePlayerForId } from "../../graphql/subscriptions";
+} from 'API';
+import { ListGamesWithPlayersQuery } from 'graphql-custom/API';
+import { createPlayer, updatePlayer } from 'graphql/mutations';
+import { listGamesWithPlayers } from 'graphql-custom/queries';
+import { onUpdateGameForId, onUpdatePlayerForId } from 'graphql/subscriptions';
 
-const LIST_GAMES = gql(listGames);
+const LIST_GAMES = gql(listGamesWithPlayers);
 const CREATE_PLAYER = gql(createPlayer);
 const ON_UPDATE_GAME_FOR_ID = gql(onUpdateGameForId);
 const ON_UPDATE_PLAYER_FOR_ID = gql(onUpdatePlayerForId);
 const UPDATE_PLAYER = gql(updatePlayer);
 
 interface PlayerState {
+  gameError: string | undefined,
+  nameError: string | undefined,
   gameName: string | undefined,
-  gamePlayers : Array< {
-    __typename: "Player",
-    id: string,
-    name: string,
-    role?: string | null,
-    deceased?: boolean | null,
-    gameID: string,
-    createdAt: string,
-    updatedAt: string,
-  } | null > | null | undefined,
+  gamePlayers : Array< Player | null > | null | undefined,
   id: string | undefined,
   name: string | undefined,
   status: 'joiningGame' | 'waitingForGameToStart' | 'gameStarted' | 'nightStarted' | 
@@ -46,6 +40,8 @@ interface PlayerState {
 }
 
 const initialState: PlayerState = {
+  gameError: undefined,
+  nameError: undefined,
   gameName: undefined,
   gamePlayers: undefined,
   id: undefined,
@@ -61,6 +57,16 @@ export const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
+    setGameError: (state, action: PayloadAction<string>) => {
+      state.gameError = action.payload;
+      state.nameError = undefined;
+      state.status = undefined;
+    },
+    setNameError: (state, action: PayloadAction<string>) => {
+      state.gameError = undefined;
+      state.nameError = action.payload;
+      state.status = undefined;
+    },
     setStatus: (state, action: PayloadAction<PlayerState['status']>) => {
       state.status = action.payload;
     },
@@ -69,6 +75,8 @@ export const playerSlice = createSlice({
       state.id = payload.playerId;
       state.name = payload.playerName;
       state.status = 'waitingForGameToStart';
+      state.nameError = undefined;
+      state.gameError = undefined;
     },
     updatePlayerGame: (state, { payload }: PayloadAction<{ status: PlayerState['status'], players: PlayerState['gamePlayers'] }>) => {
       state.status = payload.status;
@@ -81,13 +89,15 @@ export const playerSlice = createSlice({
   },
 })
 
-const { joinedGame, setStatus, updatePlayerGame, updatePlayerAttributes } = playerSlice.actions;
+const { setGameError, setNameError, setStatus, joinedGame, updatePlayerGame, updatePlayerAttributes } = playerSlice.actions;
 
 export default playerSlice.reducer;
 
 // Selectors
 
 const selectId = (state: RootState) => state.player.id;
+export const selectGameError = (state: RootState) => state.player.gameError;
+export const selectNameError = (state: RootState) => state.player.nameError;
 export const selectStatus = (state: RootState) => state.player.status;
 export const selectRole = (state: RootState) => state.player.role;
 export const selectDeceased = (state: RootState) => state.player.deceased;
@@ -102,37 +112,39 @@ export const selectAliveAll = (state: RootState) =>
 
 export const joinGame = (gameName: string, playerName: string): AppThunk => async (
   dispatch,
-  getState,
+  _getState,
   client
 ) => {
   dispatch(setStatus('joiningGame'));
-  const gameQueryResponse = await client.query<ListGamesQuery, ListGamesQueryVariables>({
+  const gameQueryResponse = await client.query<ListGamesWithPlayersQuery, ListGamesQueryVariables>({
     query: LIST_GAMES,
     variables: { filter: { name: { eq: gameName }}}
   });
   console.log('Query game gameQueryResponse', gameQueryResponse);
   const games = gameQueryResponse?.data?.listGames?.items;
 
-  let game: any;
+  let game;
   if (games?.length && games[0]) {
     if (games.length === 1) {
       game = games[0];
     } else {
-      console.error('Multiple games with the same name exist', gameName);
+      console.error('Multiple games with the same name exist');
+      dispatch(setGameError('Multiple games with the same name exist'));
       return;
     }
   } else {
-    console.error('Could not find game with name', gameName);
+    dispatch(setGameError('Could not find a game with this id'));
     return;
-    // WBN error handling
   }
 
   console.log('game', game);
 
   if (game.status !== 'waitingForPlayers') {
-    console.error('game is not accepting players', gameName);
+    dispatch(setGameError('Game has already started'));
     return;
-    // WBN error handling
+  } else if (game.players?.items.some(player => player?.name === playerName)) {
+    dispatch(setNameError('A player in the game already has this name'));
+    return;
   }
 
   const createPlayerResponse = await client.mutate<CreatePlayerMutation, CreatePlayerMutationVariables>({

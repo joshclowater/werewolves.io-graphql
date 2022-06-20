@@ -2,10 +2,10 @@ import {
   ApolloClient,
   ApolloLink,
   InMemoryCache,
-} from "@apollo/client";
+} from '@apollo/client';
 import { createAuthLink, AUTH_TYPE, AuthOptions } from 'aws-appsync-auth-link';
 import { createSubscriptionHandshakeLink } from 'aws-appsync-subscription-link';
-import appSyncConfig from "./aws-exports";
+import appSyncConfig from './aws-exports';
 
 const url = appSyncConfig.aws_appsync_graphqlEndpoint;
 const region = appSyncConfig.aws_appsync_region;

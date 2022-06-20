@@ -3,15 +3,15 @@ import {
   useLazyQuery,
   useMutation,
   gql
-} from "@apollo/client";
+} from '@apollo/client';
 import {
   CreatePlayerMutation,
   CreatePlayerMutationVariables,
   ListGamesQuery,
   ListGamesQueryVariables,
-} from "../../API";
-import { listGames } from "../../graphql/queries";
-import { createPlayer } from "../../graphql/mutations";
+} from '../../API';
+import { listGames } from '../../graphql/queries';
+import { createPlayer } from '../../graphql/mutations';
 
 const CREATE_PLAYER = gql(createPlayer);
 const LIST_GAMES = gql(listGames);
@@ -39,7 +39,6 @@ const AddPlayer = () => {
           }
         } else {
           console.warn('Could not find game with name', gameName);
-          // TODO error handling
         }
       }
     }

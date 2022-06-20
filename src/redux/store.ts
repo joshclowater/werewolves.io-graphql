@@ -2,7 +2,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import {
   ApolloClient,
   InMemoryCache,
-} from "@apollo/client";
+} from '@apollo/client';
 import client from '../GraphQLClient';
 import host from '../features/host/hostSlice';
 import player from '../features/player/playerSlice';

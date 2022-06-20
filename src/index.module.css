@@ -12,3 +12,8 @@
 .bottomSpace {
   margin-bottom: 2vh;
 }
+
+.error {
+  color: rgb(244, 67, 54);
+  font-size: 2vh;
+}

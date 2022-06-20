@@ -13,9 +13,9 @@ import {
   OnUpdatePlayerForIdSubscriptionVariables,
   UpdatePlayerMutation,
   UpdatePlayerMutationVariables
-} from "../../API";
-import { createGame as createGameMutation, updateGame, updatePlayer } from "../../graphql/mutations";
-import { onCreatePlayerForGame, onUpdatePlayerForId } from "../../graphql/subscriptions";
+} from '../../API';
+import { createGame as createGameMutation, updateGame, updatePlayer } from '../../graphql/mutations';
+import { onCreatePlayerForGame, onUpdatePlayerForId } from '../../graphql/subscriptions';
 import { timeout } from '../../utils/Time';
 import { modeOfArray } from '../../utils/Statistics';
 
