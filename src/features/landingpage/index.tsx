@@ -14,12 +14,14 @@ const LandingPage = ({ setRole }: { setRole: Function }) => {
           Join Game
         </button>
       </div>
+      <div className={styles.Instructions}>
+        <a href="https://www.wikihow.com/Play-Werewolf-(Party-Game)" target="_blank" rel="noopener noreferrer">
+          Instructions
+        </a>
+      </div>
       <div className={styles.Footer}>
         {'Icons made by '}
-        <a
-          href="https://www.flaticon.com/authors/roundicons"
-          title="Roundicons"
-        >
+        <a href="https://www.flaticon.com/authors/roundicons">
           Roundicons
         </a>
         {' from '}
@@ -27,10 +29,7 @@ const LandingPage = ({ setRole }: { setRole: Function }) => {
           www.flaticon.com
         </a>
         {' are licensed by '}
-        <a
-          href="http://creativecommons.org/licenses/by/3.0/"
-          title="Creative Commons BY 3.0"
-        >
+        <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">
           CC 3.0 BY
         </a>
         .

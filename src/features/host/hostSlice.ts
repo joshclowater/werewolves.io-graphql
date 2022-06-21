@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AppThunk, RootState } from '../../redux/store';
+import type { AppThunk, RootState } from 'redux/store';
 import {
   Player,
   CreateGameMutation,
@@ -13,11 +13,11 @@ import {
   OnUpdatePlayerForIdSubscriptionVariables,
   UpdatePlayerMutation,
   UpdatePlayerMutationVariables
-} from '../../API';
-import { createGame as createGameMutation, updateGame, updatePlayer } from '../../graphql/mutations';
-import { onCreatePlayerForGame, onUpdatePlayerForId } from '../../graphql/subscriptions';
-import { timeout } from '../../utils/Time';
-import { modeOfArray } from '../../utils/Statistics';
+} from 'API';
+import { createGame as createGameMutation, updateGame, updatePlayer } from 'graphql/mutations';
+import { onCreatePlayerForGame, onUpdatePlayerForId } from 'graphql/subscriptions';
+import { timeout } from 'utils/Time';
+import { modeOfArray } from 'utils/Statistics';
 
 const CREATE_GAME = gql(createGameMutation);
 const UPDATE_GAME = gql(updateGame);

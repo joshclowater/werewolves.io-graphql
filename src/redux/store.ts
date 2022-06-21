@@ -3,9 +3,9 @@ import {
   ApolloClient,
   InMemoryCache,
 } from '@apollo/client';
-import client from '../GraphQLClient';
-import host from '../features/host/hostSlice';
-import player from '../features/player/playerSlice';
+import client from 'GraphQLClient';
+import host from 'features/host/hostSlice';
+import player from 'features/player/playerSlice';
 
 export const store = configureStore({
   reducer: {
