@@ -3,14 +3,11 @@ backend:
   phases:
     preBuild:
       commands:
-        - npm i graphql-ttl-transformer
+        - yarn add graphql-ttl-transformer
     build:
       commands:
         - '# Execute Amplify CLI with the helper script'
         - amplifyPush --simple
-  cache:
-    paths:
-      - node_modules/**/*
 frontend:
   phases:
     preBuild:

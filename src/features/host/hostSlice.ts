@@ -205,7 +205,7 @@ export const startGame = (): AppThunk => async (
         if (status === 'startingGame' || status === 'gameStarted') {
           console.log('initializing werewolf');
         } else if (status === 'werewolvesPick') {
-          // TODO move this into separate thunk function
+          // WBN move this into separate thunk function
           console.log('werewolf submitted pick', werewolfPlayerId, updatedPlayer);
           const werewolves = selectWerewolves(getState());
           const allWerewolvesSubmittedPicks = werewolves.filter(werewolf => !werewolf.pick).length === 0;

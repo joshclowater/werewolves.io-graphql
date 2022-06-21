@@ -37,3 +37,8 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.
 
+
+## Development
+
+[VS Code](https://code.visualstudio.com/) is the recommended editor, along with the following extensions:
+* [CSS Modules](https://marketplace.visualstudio.com/items?itemName=clinyong.vscode-css-modules)
