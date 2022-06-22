@@ -1,4 +1,5 @@
 import logo from 'assets/images/wolf.svg';
+import facebookLogo from 'assets/images/f-logo.png';
 import styles from './index.module.css';
 
 const LandingPage = ({ setRole }: { setRole: Function }) => {
@@ -20,19 +21,24 @@ const LandingPage = ({ setRole }: { setRole: Function }) => {
         </a>
       </div>
       <div className={styles.Footer}>
-        {'Icons made by '}
-        <a href="https://www.flaticon.com/authors/roundicons">
-          Roundicons
+        <a href="https://www.facebook.com/Werewolvesio-102622542503843" target="_blank" rel="noopener noreferrer">
+          <img src={facebookLogo} alt="Facebook page" className={styles.FacebookLogo} />
         </a>
-        {' from '}
-        <a href="https://www.flaticon.com/" title="Flaticon">
-          www.flaticon.com
-        </a>
-        {' are licensed by '}
-        <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">
-          CC 3.0 BY
-        </a>
-        .
+        <div>
+          {'Icons made by '}
+          <a href="https://www.flaticon.com/authors/roundicons">
+            Roundicons
+          </a>
+          {' from '}
+          <a href="https://www.flaticon.com/" title="Flaticon">
+            www.flaticon.com
+          </a>
+          {' are licensed by '}
+          <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">
+            CC 3.0 BY
+          </a>
+          .
+        </div>
       </div>
     </div>
   );
