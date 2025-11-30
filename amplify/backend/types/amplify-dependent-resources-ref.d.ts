@@ -1,8 +1,8 @@
 export type AmplifyDependentResourcesAttributes = {
-    "api": {
-        "werewolvesiographql": {
-            "GraphQLAPIIdOutput": "string",
-            "GraphQLAPIEndpointOutput": "string"
-        }
+  "api": {
+    "werewolvesiographql": {
+      "GraphQLAPIEndpointOutput": "string",
+      "GraphQLAPIIdOutput": "string"
     }
+  }
 }

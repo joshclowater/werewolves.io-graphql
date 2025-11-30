@@ -5,13 +5,13 @@ import {
 } from '@apollo/client';
 import { createAuthLink, AUTH_TYPE, AuthOptions } from 'aws-appsync-auth-link';
 import { createSubscriptionHandshakeLink } from 'aws-appsync-subscription-link';
-import appSyncConfig from './aws-exports';
+import amplifyConfig from './amplifyconfiguration.json';
 
-const url = appSyncConfig.aws_appsync_graphqlEndpoint;
-const region = appSyncConfig.aws_appsync_region;
+const url = amplifyConfig.aws_appsync_graphqlEndpoint;
+const region = amplifyConfig.aws_appsync_region;
 const auth: AuthOptions = {
   type: AUTH_TYPE.API_KEY,
-  apiKey: appSyncConfig.aws_appsync_apiKey,
+  apiKey: amplifyConfig.aws_appsync_apiKey,
 };
 
 const link = ApolloLink.from([

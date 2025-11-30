@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "serviceName": "AppSync",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 365,
+      "apiKeyExpirationDate": "2026-11-30T18:49:24.177Z",
+      "keyDescription": ""
+    },
+    "conflictResolution": {},
+    "apiName": "werewolvesiographql",
+    "additionalAuthTypes": []
+  }
+}
